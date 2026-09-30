@@ -1,0 +1,23 @@
+{
+  "route": {
+    "rules": [
+      {
+        "rule_set": "claude",
+        "action": "route",
+        "outbound": "CLAUDE"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "claude",
+        "format": "binary",
+        "url": "https://raw.githubusercontent.com/Karal23/claude-routing-rules/main/sing-box/claude.srs",
+        "http_client": {
+          "detour": "CLAUDE"
+        },
+        "update_interval": "1d"
+      }
+    ]
+  }
+}
