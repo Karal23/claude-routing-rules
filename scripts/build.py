@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build both client formats from the checked-in source snapshots."""
+"""Build client rule sets from the checked-in source snapshots."""
 
 import argparse
 import ipaddress
@@ -57,6 +57,20 @@ def main():
     subprocess.run([args.sing_box, "rule-set", "compile", "--output",
                     str(sing_dir / "claude.srs"), str(source_path)], check=True)
 
+    domain_lines = []
+    for field, kind in (("domain", "DOMAIN"), ("domain_suffix", "DOMAIN-SUFFIX"),
+                        ("domain_keyword", "DOMAIN-KEYWORD")):
+        domain_lines.extend(f"{kind},{value}" for value in domain_rule[field])
+    ip_lines = []
+    for cidr in cidrs:
+        kind = "IP-CIDR" if ipaddress.ip_network(cidr).version == 4 else "IP-CIDR6"
+        ip_lines.append(f"{kind},{cidr},no-resolve")
+
+    mihomo_dir = ROOT / "mihomo"
+    mihomo_dir.mkdir(exist_ok=True)
+    payload = [f"  - {json.dumps(line)}" for line in domain_lines + ip_lines]
+    (mihomo_dir / "claude.yaml").write_text("payload:\n" + "\n".join(payload) + "\n")
+
     lines = [
         "# Claude complete rules: core, CDN, auth, telemetry, widgets, NTP, IP/ASN",
         "# Source: https://ip.net.coffee/claude/site.html",
@@ -65,13 +79,7 @@ def main():
         "# NTP category affects all matching device traffic, not only Claude.",
         "",
     ]
-    for field, kind in (("domain", "DOMAIN"), ("domain_suffix", "DOMAIN-SUFFIX"),
-                        ("domain_keyword", "DOMAIN-KEYWORD")):
-        lines.extend(f"{kind},{value}" for value in domain_rule[field])
-    lines.append("")
-    for cidr in cidrs:
-        kind = "IP-CIDR" if ipaddress.ip_network(cidr).version == 4 else "IP-CIDR6"
-        lines.append(f"{kind},{cidr},no-resolve")
+    lines.extend(domain_lines + [""] + ip_lines)
     lines.extend(f"IP-ASN,{asn_id},no-resolve" for asn_id in source["ip_asn"])
     (ROOT / "loon").mkdir(exist_ok=True)
     (ROOT / "loon/claude.list").write_text("\n".join(lines) + "\n")

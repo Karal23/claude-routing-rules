@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | sing-box 1.15 系列 | [claude.srs](https://raw.githubusercontent.com/Karal23/claude-routing-rules/main/sing-box/claude.srs) | 推荐，已编译二进制 |
 | sing-box JSON 源格式 | [claude.json](https://raw.githubusercontent.com/Karal23/claude-routing-rules/main/sing-box/claude.json) | 与 SRS 内容相同，二选一 |
+| BettBox / Mihomo | [claude.yaml](https://raw.githubusercontent.com/Karal23/claude-routing-rules/main/mihomo/claude.yaml) | HTTP 规则集，使用 `behavior: classical` 和 `format: yaml`，与 sing-box 使用相同的域名和 IP 快照 |
 | iOS Loon | [claude.list](https://raw.githubusercontent.com/Karal23/claude-routing-rules/main/loon/claude.list) | 原生远程规则，含 IPv4、IPv6 和 ASN |
 
 **sing-box 导入**
@@ -96,4 +97,4 @@ sing-box rule-set match --format binary sing-box/claude.srs time.apple.com
 sing-box rule-set match --format binary sing-box/claude.srs 160.79.104.1
 ```
 
-生成过程只读取仓库内的来源快照，可复现且不需要联网。更新来源快照后重新运行脚本并提交三个输出文件即可。客户端定期下载的是本仓库最新提交，本仓库没有配置自动抓取上游内容的定时任务。
+生成过程只读取仓库内的来源快照，可复现且不需要联网。更新来源快照后重新运行脚本并提交生成的规则文件即可。客户端定期下载的是本仓库最新提交，本仓库没有配置自动抓取上游内容的定时任务。
